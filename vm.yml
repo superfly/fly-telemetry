@@ -1,0 +1,20 @@
+apiVersion: 1
+datasources:
+  - name: Metrics
+    type: victoriametrics-metrics-datasource
+    access: proxy
+    url: http://data.process.${FLY_APP_NAME}.internal:8428
+    isDefault: true
+  - name: VictoriaMetrics - cluster
+    # <string, required> Sets the data source type.
+    type: victoriametrics-metrics-datasource
+    # <string, required> Sets the access mode, either
+    # proxy or direct (Server or Browser in the UI).
+    # Some data sources are incompatible with any setting
+    # but proxy (Server).
+    access: proxy
+    # <string> Sets default URL of the cluster version of VictoriaMetrics
+    url: http://vmselect:8481/select/0/prometheus
+    # <string> Sets the pre-selected datasource for new panels.
+    # You can set only one default data source per organization.
+    isDefault: false

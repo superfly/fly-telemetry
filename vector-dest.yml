@@ -1,0 +1,41 @@
+api: {enabled: true}
+sources:
+  input:
+    type: vector
+    address: '[::]:6000'
+
+transforms:
+  parsed:
+    type: remap
+    inputs: [input]
+    source: ". = parse_json(.message) ?? ."
+
+sinks:
+  metrics:
+    inputs: [input]
+    type: prometheus_remote_write
+    endpoint: 'http://localhost:8428/prometheus/api/v1/write'
+    healthcheck: {enabled: false}
+
+  logs:
+    inputs: [parsed]
+    type: elasticsearch
+    endpoints: ['http://localhost:9428/insert/elasticsearch/']
+    api_version: v8
+    compression: gzip
+    healthcheck: {enabled: false}
+    query:
+      _msg_field: message
+      _time_field: timestamp
+      _stream_fields: region,host,fly.app.name,fly.app.instance
+
+  archive:
+    inputs: [parsed]
+    type: aws_s3
+    bucket: "${BUCKET_NAME?}"
+    region: "${AWS_REGION?}"
+    compression: gzip
+    framing: {method: newline_delimited}
+    encoding: {codec: json}
+    key_prefix: "{{fly.app.name}}/%F/"
+    endpoint: ${AWS_ENDPOINT_URL_S3:-null}

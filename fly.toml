@@ -1,0 +1,13 @@
+app = "fly-data-shipper"
+primary_region = "lax"
+
+[processes]
+data="/start.sh"
+grafana="/run.sh"
+src="vector -c vector-src.yml"
+
+[env]
+enableTCP6=true
+retentionPeriod="30d"
+VECTOR_REQUIRE_HEALTHY=true
+GF_INSTALL_PLUGINS="victoriametrics-logs-datasource,victoriametrics-metrics-datasource"
