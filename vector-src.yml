@@ -1,5 +1,6 @@
 api: {enabled: true}
 sources:
+  internal: {type: internal_metrics}
   input:
     type: nats
     url: "nats://[fdaa::3]:4223"
@@ -12,7 +13,7 @@ sources:
 sinks:
   vector:
     type: vector
-    inputs: [input]
+    inputs: [input, internal]
     compression: true
     address: "data.process.${FLY_APP_NAME}.internal:6000"
     buffer: {type: disk, max_size: 268435488}

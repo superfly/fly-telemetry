@@ -8,6 +8,9 @@ COPY --link --from=vector /usr/local/bin/vector /usr/local/bin/
 
 COPY vector-*.yml /
 COPY start.sh /
+COPY vm.yml /etc/grafana/provisioning/datasources/
+COPY grafana.ini /etc/grafana/
+
 USER root
 WORKDIR /
 ENTRYPOINT []
