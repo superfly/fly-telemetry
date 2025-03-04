@@ -1,6 +1,6 @@
 # Fly Data Shipper
 
-- `src` consumes org logs+metrics from NATS to a local disk buffer and forwards to `dest`.
+- `src` consumes org logs+metrics from NATS to a local disk buffer and forwards to `data`.
 - `data` sends logs to local VictoriaLogs, metrics to local VictoriaMetrics, and both to object storage for long-term archival.
 - `grafana` runs a local Grafana instance, with data sources properly configured.
 

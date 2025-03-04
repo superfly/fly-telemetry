@@ -6,15 +6,32 @@ sources:
     subject: 'logs.>'
     auth: {strategy: user_password, user_password: {user: "${ORG-personal}", password: "${ACCESS_TOKEN?}"}}
     connection_name: Fly logs stream
-    decoding: {codec: json}
+    decoding:
+      codec: vrl
+      vrl:
+        source: |
+          . = parse_json!(.message)
+          . = merge!(., parse_json(.message) ?? {})
 
-  metrics:
+  metrics_in:
     type: nats
     url: "nats://[fdaa::3]:4223"
     subject: 'metrics.>'
     auth: {strategy: user_password, user_password: {user: "${ORG-personal}", password: "${ACCESS_TOKEN?}"}}
     connection_name: Fly metrics stream
-    decoding: {codec: json}
+    decoding:
+      codec: vrl
+      vrl:
+        source: |
+          . = parse_json!(.message)
+          .timestamp = parse_timestamp!(.timestamp, "%+")
+
+transforms:
+  metrics:
+    type: log_to_metric
+    inputs: [metrics_in]
+    all_metrics: true
+    metrics: []
 
 sinks:
   logs_out:

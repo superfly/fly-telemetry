@@ -1,19 +1,7 @@
 api: {enabled: true}
 sources:
-  logs_in:    { type: vector, address: '[::]:6000'}
-  metrics_in: { type: vector, address: '[::]:6001'}
-
-transforms:
-  logs:
-    type: remap
-    inputs: [logs_in]
-    source: ". = merge!(., parse_json(.message) ?? {})"
-
-  metrics:
-    type: log_to_metric
-    inputs: [metrics_in]
-    all_metrics: true
-    metrics: []
+  logs:    { type: vector, address: '[::]:6000'}
+  metrics: { type: vector, address: '[::]:6001'}
 
 sinks:
   metrics_out:
