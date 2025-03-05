@@ -1,8 +1,18 @@
 # Fly Data Shipper
 
-- `src` consumes org logs+metrics from NATS to a local disk buffer and forwards to `data`.
-- `data` sends logs to local VictoriaLogs, metrics to local VictoriaMetrics, and both to object storage for long-term archival.
-- `grafana` runs a local Grafana instance, with data sources properly configured.
+Consume logs+metrics from the Fly.io-provided NATS streams on `[fdaa::3]:4223`.
+Send logs to local VictoriaLogs, metrics to local VictoriaMetrics, and both to S3 for long-term archival.
+Also run a local Grafana instance with data sources and dashboards all hooked up and ready to go.
+
+This is a simple, lightweight reference implementation for quick, out-of-the-box observability
+for simple deployments on Fly.io. It runs in a single monolithic instance without any High Availability
+clustering set up. You can vertically scale this deployment as-is, but once you grow out of
+this setup you're welcome to fork and modify this template to extend it yourself, or ship data directly
+to managed services that can offer better support.
+
+The app doesn't implement any authentication, and doesn't expose any public services by default.
+Grafana is configured for anonymous admin access, which you can reach on its default port 3000 over 6pn.
+Run `fly proxy 3000`, or set up a persistent Wireguard tunnel to your org's network.
 
 Required env variables (provide with `fly secrets set`, or modify `fly.toml`):
 

@@ -1,0 +1,21 @@
+apiVersion: 1
+datasources:
+  - name: Metrics
+    type: prometheus
+    access: proxy
+    url: http://${FLY_APP_NAME}.internal:8428
+    isDefault: true
+    jsonData:
+      prometheusType: Prometheus
+      prometheusVersion: 2.24.0
+      timeInterval: 15s
+      cacheLevel: "High"
+      incrementalQuerying: true
+  - name: VictoriaMetrics
+    type: victoriametrics-metrics-datasource
+    access: proxy
+    url: http://${FLY_APP_NAME}.internal:8428
+  - name: Logs
+    type: victoriametrics-logs-datasource
+    access: proxy
+    url: http://${FLY_APP_NAME}.internal:9428

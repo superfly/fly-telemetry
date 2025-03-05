@@ -1,26 +1,15 @@
 app = "fly-data-shipper"
-primary_region = "lax"
-
-[processes]
-  data="/start.sh"
-  grafana="/run.sh"
-  src="vector -c vector-src.yml"
+swap_size_mb = 1024
 
 [env]
   enableTCP6=true
   retentionPeriod="30d"
   VECTOR_REQUIRE_HEALTHY=true
-  GF_INSTALL_PLUGINS="victoriametrics-logs-datasource,victoriametrics-metrics-datasource"
-
-[[services]]
-  processes=["grafana"]
-  internal_port=3000
-  auto_start_machines=true
-  auto_stop_machines="suspend"
-  protocol="tcp"
-  ports=[{handlers=["http"], port=80}]
+  GF_PATHS_DATA="/data/grafana"
 
 [mounts]
-  source="grafana"
-  destination="/var/lib/grafana"
-  processes=["grafana"]
+  source="data"
+  destination="/data"
+
+[vm]
+  memory = "1gb"

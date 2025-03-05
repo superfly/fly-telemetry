@@ -1,16 +1,19 @@
 FROM victoriametrics/victoria-metrics AS metrics
 FROM victoriametrics/victoria-logs AS logs
 FROM timberio/vector:latest-distroless-static AS vector
-FROM grafana/grafana:latest
+FROM flyio/grafana-oss:dev
 COPY --link --from=metrics /victoria-metrics-prod /
 COPY --link --from=logs /victoria-logs-prod /
 COPY --link --from=vector /usr/local/bin/vector /usr/local/bin/
 
-COPY vector-*.yml /
+COPY vector.yaml /etc/vector/
 COPY start.sh /
-COPY vm.yml /etc/grafana/provisioning/datasources/
+COPY datasources.yml /etc/grafana/provisioning/datasources/
 COPY grafana.ini /etc/grafana/
+RUN grafana cli plugins install victoriametrics-logs-datasource && \
+    grafana cli plugins install victoriametrics-metrics-datasource
 
 USER root
 WORKDIR /
 ENTRYPOINT []
+CMD ["/start.sh"]

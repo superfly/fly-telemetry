@@ -1,16 +1,46 @@
 api: {enabled: true}
 sources:
-  logs:    { type: vector, address: '[::]:6000'}
-  metrics: { type: vector, address: '[::]:6001'}
+  logs:
+    type: nats
+    url: "nats://[fdaa::3]:4223"
+    subject: 'logs.>'
+    auth: {strategy: user_password, user_password: {user: "${ORG-personal}", password: "${ACCESS_TOKEN?}"}}
+    connection_name: Fly logs stream
+    decoding:
+      codec: vrl
+      vrl:
+        source: |
+          . = parse_json!(.message)
+          . = merge!(., parse_json(.message) ?? {})
+
+  metrics_in:
+    type: nats
+    url: "nats://[fdaa::3]:4223"
+    subject: 'metrics.>'
+    auth: {strategy: user_password, user_password: {user: "${ORG-personal}", password: "${ACCESS_TOKEN?}"}}
+    connection_name: Fly metrics stream
+    decoding:
+      codec: vrl
+      vrl:
+        source: |
+          . = parse_json!(.message)
+          .timestamp = parse_timestamp!(.timestamp, "%+")
+
+transforms:
+  metrics:
+    type: log_to_metric
+    inputs: [metrics_in]
+    all_metrics: true
+    metrics: []
 
 sinks:
-  metrics_out:
+  metrics_db:
     inputs: [metrics]
     type: prometheus_remote_write
     endpoint: 'http://localhost:8428/prometheus/api/v1/write'
     healthcheck: {enabled: false}
 
-  logs_out:
+  logs_db:
     inputs: [logs]
     type: elasticsearch
     endpoints: ['http://localhost:9428/insert/elasticsearch/']
@@ -22,7 +52,7 @@ sinks:
       _time_field: timestamp
       _stream_fields: region,host,fly.app.name,fly.app.instance
 
-  s3_logs:
+  logs_s3:
     inputs: [logs]
     type: aws_s3
     bucket: "${BUCKET_NAME?}"
@@ -32,7 +62,7 @@ sinks:
     encoding: {codec: json}
     key_prefix: "{{fly.app.name}}/%F/"
     endpoint: ${AWS_ENDPOINT_URL_S3:-null}
-  s3_metrics:
+  metrics_s3:
     inputs: [metrics]
     type: aws_s3
     bucket: "${BUCKET_NAME?}"
