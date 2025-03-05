@@ -1,9 +1,10 @@
 apiVersion: 1
 datasources:
   - name: Metrics
+    uid: prometheus_on_fly
     type: prometheus
     access: proxy
-    url: http://${FLY_APP_NAME}.internal:8428
+    url: http://localhost:8428
     isDefault: true
     jsonData:
       prometheusType: Prometheus
@@ -14,8 +15,9 @@ datasources:
   - name: VictoriaMetrics
     type: victoriametrics-metrics-datasource
     access: proxy
-    url: http://${FLY_APP_NAME}.internal:8428
+    url: http://localhost:8428
   - name: Logs
     type: victoriametrics-logs-datasource
+    uid: application_logs
     access: proxy
-    url: http://${FLY_APP_NAME}.internal:9428
+    url: http://localhost:9428
