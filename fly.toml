@@ -7,5 +7,4 @@ http_service.internal_port=3000
 [env]
   enableTCP6=true
   retentionPeriod="30d"
-  VECTOR_REQUIRE_HEALTHY=true
   GF_PATHS_DATA="/data/grafana"

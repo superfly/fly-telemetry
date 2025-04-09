@@ -6,6 +6,7 @@ sources:
     subject: 'logs.>'
     auth: {strategy: user_password, user_password: {user: "${ORG-personal}", password: "${ACCESS_TOKEN?}"}}
     connection_name: Fly logs stream
+    queue: "${FLY_APP_NAME}"
     decoding:
       codec: vrl
       vrl:
@@ -19,12 +20,16 @@ sources:
     subject: 'metrics.>'
     auth: {strategy: user_password, user_password: {user: "${ORG-personal}", password: "${ACCESS_TOKEN?}"}}
     connection_name: Fly metrics stream
+    queue: "${FLY_APP_NAME}"
     decoding:
       codec: vrl
       vrl:
         source: |
-          . = parse_json!(.message)
-          .timestamp = parse_timestamp!(.timestamp, "%+")
+          metric = array!(parse_json!(decode_zstd!(.message)))
+          for_each(metric) -> |_idx, val| {val.timestamp = parse_timestamp!(val.timestamp, "%+")}
+          . = metric
+  metrics_vector: {type: vector, address: '[::]:6000'}
+  logs_vector:    {type: vector, address: '[::]:6001'}
 
 transforms:
   metrics:
@@ -35,13 +40,13 @@ transforms:
 
 sinks:
   metrics_db:
-    inputs: [metrics]
+    inputs: [metrics, metrics_vector]
     type: prometheus_remote_write
     endpoint: 'http://localhost:8428/prometheus/api/v1/write'
     healthcheck: {enabled: false}
 
   logs_db:
-    inputs: [logs]
+    inputs: [logs, logs_vector]
     type: elasticsearch
     endpoints: ['http://localhost:9428/insert/elasticsearch/']
     api_version: v8
