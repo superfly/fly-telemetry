@@ -51,24 +51,3 @@ sinks:
       _msg_field: message
       _time_field: timestamp
       _stream_fields: region,host,fly.app.name,fly.app.instance
-
-  logs_s3:
-    inputs: [logs]
-    type: aws_s3
-    bucket: "${BUCKET_NAME?}"
-    region: "${AWS_REGION?}"
-    compression: gzip
-    framing: {method: newline_delimited}
-    encoding: {codec: json}
-    key_prefix: "{{fly.app.name}}/%F/"
-    endpoint: ${AWS_ENDPOINT_URL_S3:-null}
-  metrics_s3:
-    inputs: [metrics]
-    type: aws_s3
-    bucket: "${BUCKET_NAME?}"
-    region: "${AWS_REGION?}"
-    compression: gzip
-    framing: {method: newline_delimited}
-    encoding: {codec: json}
-    key_prefix: "{{tags.app}}/metrics/%F/"
-    endpoint: ${AWS_ENDPOINT_URL_S3:-null}

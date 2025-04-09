@@ -1,7 +1,7 @@
 # Fly Data Shipper
 
 Consume logs+metrics from the Fly.io-provided NATS streams on `[fdaa::3]:4223`.
-Send logs to local VictoriaLogs, metrics to local VictoriaMetrics, and both to S3 for long-term archival.
+Send logs to local VictoriaLogs and metrics to local VictoriaMetrics.
 Also run a local Grafana instance with data sources and dashboards all hooked up and ready to go.
 
 This is a simple, lightweight reference implementation for quick, out-of-the-box observability
@@ -31,7 +31,4 @@ dashboards, alert rules, etc., so all state is consistently maintained across bo
 Required env variables (provide with `fly secrets set`, or modify `fly.toml`):
 
 * `ACCESS_TOKEN` (`fly secrets set ACCESS_TOKEN=$(fly tokens create readonly)`)
-* `BUCKET_NAME`
-* `AWS_REGION`
-* `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`, or AWS credentials through another provider
 * `ORG` (default `personal`)
