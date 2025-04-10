@@ -16,7 +16,7 @@ while :; do
     buffer: {type: disk, max_size: 268435488}
   vector_logs_$peer:
     type: vector
-    inputs: [metrics]
+    inputs: [logs]
     healthcheck: {enabled: false}
     compression: true
     address: "$peer.vm.${FLY_APP_NAME}.internal:6001"

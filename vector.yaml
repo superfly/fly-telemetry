@@ -25,7 +25,7 @@ sources:
       codec: vrl
       vrl:
         source: |
-          metric = array!(parse_json!(decode_zstd!(.message)))
+          metric = array!(parse_json!(decode_zstd(.message) ?? "[]"))
           for_each(metric) -> |_idx, val| {val.timestamp = parse_timestamp!(val.timestamp, "%+")}
           . = metric
   metrics_vector: {type: vector, address: '[::]:6000'}
@@ -44,6 +44,7 @@ sinks:
     type: prometheus_remote_write
     endpoint: 'http://localhost:8428/prometheus/api/v1/write'
     healthcheck: {enabled: false}
+    batch: {aggregate: false}
 
   logs_db:
     inputs: [logs, logs_vector]

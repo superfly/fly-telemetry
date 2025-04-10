@@ -8,3 +8,4 @@ http_service.internal_port=3000
   enableTCP6=true
   retentionPeriod="30d"
   GF_PATHS_DATA="/data/grafana"
+  VECTOR_WATCH_CONFIG=true
