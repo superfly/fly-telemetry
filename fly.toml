@@ -9,3 +9,4 @@ http_service.internal_port=3000
   retentionPeriod="30d"
   GF_PATHS_DATA="/data/grafana"
   VECTOR_WATCH_CONFIG=true
+  VECTOR_CONFIG_DIR="/etc/vector"
