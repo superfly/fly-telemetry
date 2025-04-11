@@ -32,9 +32,16 @@ sources:
   logs_vector:    {type: vector, address: '[::]:6001'}
 
 transforms:
+  # https://github.com/vectordotdev/vector/issues/20494
+  metrics_fix:
+    type: remap
+    inputs: [metrics_in]
+    source: |
+      if exists(.aggregated_histogram) { .histogram = del(.aggregated_histogram) }
+      if exists(.aggregated_summary)   { .summary   = del(.aggregated_summary)   }
   metrics:
     type: log_to_metric
-    inputs: [metrics_in]
+    inputs: [metrics_fix]
     all_metrics: true
     metrics: []
 
