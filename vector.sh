@@ -12,4 +12,6 @@ address: "$peer.vm.$FLY_APP_NAME.internal:6000"
 buffer: {type: disk, max_size: ${DISK_BUFFER:-268435488}, when_full: drop_newest}
 YAML
   done
+export VECTOR_WATCH_CONFIG=true
+export VECTOR_CONFIG_DIR=/etc/vector
 exec vector

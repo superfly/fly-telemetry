@@ -1,12 +1,7 @@
-app = "example-fly-telemetry"
+app = "fly-data-shipper"
 swap_size_mb = 1024
 vm.memory="1gb"
 mounts={source="data", destination="/data"}
 http_service.internal_port=3000
 
-[env]
-  enableTCP6=true
-  retentionPeriod="30d"
-  GF_PATHS_DATA="/data/grafana"
-  VECTOR_WATCH_CONFIG=true
-  VECTOR_CONFIG_DIR="/etc/vector"
+env.retentionPeriod="30d"
