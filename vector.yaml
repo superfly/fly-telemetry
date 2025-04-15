@@ -1,5 +1,7 @@
 api: {enabled: true}
 sources:
+  cluster: {type: vector, address: '[::]:6000'}
+
   logs:
     type: nats
     url: "nats://[fdaa::3]:4223"
@@ -14,7 +16,7 @@ sources:
           . = parse_json!(.message)
           . = merge!(., parse_json(.message) ?? {})
 
-  metrics_in:
+  metrics:
     type: nats
     url: "nats://[fdaa::3]:4223"
     subject: 'metrics.>'
@@ -28,33 +30,54 @@ sources:
           metric = array!(parse_json!(decode_zstd(.message) ?? "[]"))
           for_each(metric) -> |_idx, val| {val.timestamp = parse_timestamp!(val.timestamp, "%+")}
           . = metric
-  metrics_vector: {type: vector, address: '[::]:6000'}
-  logs_vector:    {type: vector, address: '[::]:6001'}
+
+  local:
+    type: prometheus_scrape
+    endpoint_tag: process
+    endpoints:
+      - http://localhost:8428/metrics
+      - http://localhost:9428/metrics
 
 transforms:
   # https://github.com/vectordotdev/vector/issues/20494
   metrics_fix:
     type: remap
-    inputs: [metrics_in]
+    inputs: [metrics]
     source: |
       if exists(.aggregated_histogram) { .histogram = del(.aggregated_histogram) }
       if exists(.aggregated_summary)   { .summary   = del(.aggregated_summary)   }
-  metrics:
+  platform-metrics:
     type: log_to_metric
     inputs: [metrics_fix]
     all_metrics: true
     metrics: []
 
+  local-metrics:
+    type: remap
+    inputs: [local]
+    source: |
+      .tags.app      = "$FLY_APP_NAME"
+      .tags.instance = "$FLY_MACHINE_ID"
+      .tags.region   = "$FLY_REGION"
+      process = parse_url(.tags.process) ?? {}
+      if process.port == 8428 { .tags.process = "metrics" }
+      if process.port == 9428 { .tags.process = "logs" }
+
+  cluster-route:
+    type: route
+    inputs: [cluster]
+    route: {logs: {type: is_log}, metrics: {type: is_metric}}
+
 sinks:
   metrics_db:
-    inputs: [metrics, metrics_vector]
+    inputs: ['*-metrics', cluster-route.metrics]
     type: prometheus_remote_write
     endpoint: 'http://localhost:8428/prometheus/api/v1/write'
     healthcheck: {enabled: false}
     batch: {aggregate: false}
 
   logs_db:
-    inputs: [logs, logs_vector]
+    inputs: ['logs', cluster-route.logs]
     type: elasticsearch
     endpoints: ['http://localhost:9428/insert/elasticsearch/']
     api_version: v8
