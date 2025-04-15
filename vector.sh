@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 # Add Vector-sink configs for all peer machines in the app.
 api() { curl -sS -H "Authorization: ${ACCESS_TOKEN?}" http://_api.internal:4280/v1/$1; }
 dir=/etc/vector/sinks; mkdir -p $dir

@@ -1,7 +1,5 @@
-app = "fly-data-shipper"
+build.image = "flyio/fly-telemetry"
 swap_size_mb = 1024
 vm.memory="1gb"
 mounts={source="data", destination="/data"}
 http_service.internal_port=3000
-
-env.retentionPeriod="30d"
