@@ -4,4 +4,4 @@ export enableTCP6=true
 /victoria-logs-prod -envflag.enable -storageDataPath /data/logs &
 /vector.sh &
 
-GF_PATHS_DATA=/data/grafana /run.sh
+/run.sh

@@ -19,4 +19,7 @@ USER root
 RUN apk add --no-cache jq
 WORKDIR /
 ENTRYPOINT []
+ENV GF_PATHS_DATA=/data/grafana
+LABEL maintainer="fly.io"
+LABEL org.opencontainers.image.source="https://github.com/superfly/fly-telemetry"
 CMD ["/start.sh"]
