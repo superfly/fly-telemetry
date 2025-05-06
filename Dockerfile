@@ -6,10 +6,12 @@ COPY --link --from=metrics /victoria-metrics-prod /
 COPY --link --from=logs /victoria-logs-prod /
 COPY --link --from=vector /usr/local/bin/vector /usr/local/bin/
 RUN grafana cli plugins install victoriametrics-logs-datasource && \
-    grafana cli plugins install victoriametrics-metrics-datasource
+    grafana cli plugins install victoriametrics-metrics-datasource && \
+    grafana cli plugins install grafana-athena-datasource
 COPY vector.yaml /etc/vector/
 COPY start.sh vector.sh import.sh /
 COPY config aws.sh /root/.aws/
+COPY config aws.sh /usr/share/grafana/.aws/
 
 COPY dashboards/grafana/ /var/lib/grafana-dashboards/
 COPY datasources.yml /etc/grafana/provisioning/datasources/
@@ -18,7 +20,7 @@ COPY grafana.ini /etc/grafana/
 
 USER root
 RUN apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing/ \
-  jq s5cmd zstd
+  curl jq s5cmd bash
 WORKDIR /
 ENTRYPOINT []
 ENV GF_PATHS_DATA=/data/grafana

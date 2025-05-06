@@ -21,3 +21,14 @@ datasources:
     uid: application_logs
     access: proxy
     url: http://localhost:9428
+  - name: Athena
+    type: grafana-athena-datasource
+    uid: athena_logs
+    jsonData:
+      authType: default
+      defaultRegion: us-east-1
+      catalog: AwsDataCatalog
+      database: 'fly_app_logs'
+      workgroup: 'fly-app-logs'
+      outputLocation: $ATHENA_LOCATION
+  
