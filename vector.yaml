@@ -68,6 +68,15 @@ transforms:
     inputs: [cluster]
     route: {logs: {type: is_log}, metrics: {type: is_metric}}
 
+  # Send alert notifications on matching [ALERT] log lines
+  alert_logs:
+    type: remap
+    inputs: ['logs', 'cluster-route.logs']
+    source: |
+      if !starts_with(string!(.message), "[ALERT]") { abort }
+      .labels = .
+      .endsAt = format_timestamp(from_unix_timestamp!(to_unix_timestamp(.labels.timestamp) + 60), "%+")
+
 sinks:
   metrics_db:
     inputs: ['*-metrics', cluster-route.metrics]
@@ -87,3 +96,12 @@ sinks:
       _msg_field: message
       _time_field: timestamp
       _stream_fields: region,host,fly.app.name,fly.app.instance
+
+  alerts:
+    type: http
+    inputs: [alert_logs]
+    uri: "http://localhost:9093/api/v2/alerts"
+    method: post
+    encoding: {codec: json}
+    batch: {max_events: 1}
+    healthcheck: {enabled: false}

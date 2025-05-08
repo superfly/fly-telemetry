@@ -31,4 +31,8 @@ datasources:
       database: 'fly_app_logs'
       workgroup: 'fly-app-logs'
       outputLocation: $ATHENA_LOCATION
-  
+  - name: Alertmanager
+    type: alertmanager
+    url: http://localhost:9093
+    jsonData:
+      implementation: prometheus

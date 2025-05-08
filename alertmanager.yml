@@ -1,0 +1,17 @@
+global:
+  slack_api_url: "${SLACK_URL}"
+route:
+  receiver: default
+  group_by: [alertname]
+  routes:
+    - receiver: log_alert
+      matchers: ['alertname="LogAlert"']
+      group_by: [fly.app.name, fly.region, fly.app.instance]
+      group_wait: 0s
+      group_interval: 1m
+receivers:
+  - name: default
+    slack_configs: [{}]
+  - name: log_alert
+    slack_configs:
+      - text: "{{ range .Alerts }}```{{ .Annotations.log }}```\n{{ end }}"

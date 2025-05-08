@@ -1,5 +1,7 @@
-build.image = "flyio/fly-telemetry"
+app = 'fly-data-shipper'
+# build.image = "flyio/fly-telemetry"
 swap_size_mb = 1024
 vm.memory="1gb"
+vm.cpus=4
 mounts={source="data", destination="/data"}
 http_service.internal_port=3000

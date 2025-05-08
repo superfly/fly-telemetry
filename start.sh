@@ -7,6 +7,14 @@ export enableTCP6=true
 /victoria-logs-prod -envflag.enable -storageDataPath /data/logs &
 /vector.sh &
 
+filter() { envsubst < "$1" | sponge "$1"; }
+filter alertmanager.yml
+alertmanager \
+  --storage.path=/data/alertmanager \
+  --web.external-url="${FLY_APP_NAME}.internal:9093" \
+  --cluster.advertise-address="[${FLY_PRIVATE_IP}]:9094" \
+  --cluster.peer="${FLY_APP_NAME}.internal:9094" &
+
 export AWS_SDK_LOAD_CONFIG=1
 export AWS_SDK_GO_LOG_LEVEL=debug
 export AWS_ENABLE_SDK_LOGGING=1
