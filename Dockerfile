@@ -1,3 +1,9 @@
+ARG VICTORIA_METRICS_TAG=v1.118.0
+ARG VICTORIA_LOGS_TAG=v1.22.2-victorialogs
+
+FROM victoriametrics/victoria-metrics:${VICTORIA_METRICS_TAG} AS metrics
+FROM victoriametrics/victoria-logs:${VICTORIA_LOGS_TAG} AS logs
+
 FROM victoriametrics/victoria-metrics AS metrics
 FROM victoriametrics/victoria-logs AS logs
 FROM timberio/vector:latest-distroless-static AS vector
