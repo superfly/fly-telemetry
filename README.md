@@ -9,9 +9,13 @@ for simple deployments on Fly.io.
 Copy the [`fly.toml` config](./fly.toml) into a new directory, run `fly launch` to create a new app, create a readonly access token, and deploy:
 ```shell
 ORG=my-org-name
-fly launch --copy-config -y --org $ORG -e ORG=$ORG --no-deploy
-fly secrets set ACCESS_TOKEN="$(fly tokens create readonly $ORG)" --stage
-fly deploy --flycast 
+fly launch --from https://github.com/superfly/fly-telemetry \
+  --yes \
+  --copy-config \
+  --org "$ORG" \
+  --env ORG="$ORG" \
+  --secret ACCESS_TOKEN="$(fly tokens create readonly "$ORG")" \
+  --flycast
 ```
 
 Once the deploy finishes, you can access the Grafana service to view your collected logs+metrics over your private network at `http://$FLY_APP_NAME.flycast/`.
