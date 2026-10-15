@@ -1,9 +1,10 @@
 ARG VICTORIA_METRICS_TAG=v1.118.0
 ARG VICTORIA_LOGS_TAG=v1.22.2-victorialogs
+ARG VECTOR_TAG=0.55.0-distroless-static
 
 FROM victoriametrics/victoria-metrics:${VICTORIA_METRICS_TAG} AS metrics
 FROM victoriametrics/victoria-logs:${VICTORIA_LOGS_TAG} AS logs
-FROM timberio/vector:latest-distroless-static AS vector
+FROM timberio/vector:${VECTOR_TAG} AS vector
 FROM grafana/grafana-oss:main
 COPY --link --from=metrics /victoria-metrics-prod /
 COPY --link --from=logs /victoria-logs-prod /
